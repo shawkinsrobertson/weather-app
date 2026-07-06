@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="styles.css">
+    <title>Weather App</title>
+  </head>
+
+  <body>
+    <h1 id="location"></h1>
+    <div id="location-selectors">
+      <select id="location-dropdown">
+        <option value="" name=""></option>
+        <option value="new-york" name="new-york">New York</option>
+        <option value="los-angeles" name="los-angeles">Los Angeles</option>
+        <option value="chicago" name="chicago">Chicago</option>
+        <option value="paris" name="paris">Paris</option>
+        <option value="tokyo" name="tokyo">Tokyo</option>
+        <option value="london" name="london">London</option>
+      </select>
+      <button id="get-weather-btn">get forecast</button>
+      <div id="unit-conversion-toggle">
+        <p>F</p>
+        <input type="checkbox" id="unit-switch">
+        <label for="unit-switch" class="toggle"></label>
+        <p>C</p>
+      </div>
+    </div>
+    <div id="main-stats">
+      <p id="weather-main"></p>
+      <img id="weather-icon" src="" alt="" />
+      <h2 id="main-temperature"></h2>
+      <p id="feels-like"></p>
+    </div>
+    <div id="secondary-stats">
+      <div class="humidity">
+      <p id="humid-label">humidity</p>
+      <div id="humidity"></div>
+      </div>
+      <div id="wind-stats">
+        <p id="wind-description">wind speed</p>
+        <h3 id="wind"></h3>
+        <p id="gust-label">with gusts of</p>
+        <p id="wind-gust"></p>
+      </div>
+    </div>
+  </body>
+  <script src="script.js"></script>
+</html>

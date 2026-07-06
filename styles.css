@@ -1,0 +1,76 @@
+
+
+/* prelim styles for organization */
+
+#location-selectors {
+  display: flex;
+  justify-content: space-around;
+}
+
+#unit-conversion-toggle {
+  display: flex;
+  align-items: center
+}
+
+.toggle {
+  width: 60px;
+  height: 30px;
+  border-radius: 30px;
+  background-color: #ccc;
+  position: relative;
+  cursor: pointer;
+}
+
+.toggle::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  height: 26px;
+  width: 26px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+label {
+  margin: 8px;
+}
+
+#unit-switch {
+  display: none;
+}
+
+#unit-switch:checked + .toggle {
+  background-color: blue;
+}
+
+#unit-switch:checked + .toggle::before {
+  left: 32px;
+}
+
+#main-stats {
+  border: 2 px solid black;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  margin: 16px auto;
+}
+
+#secondary-stats{
+  border: 2px solid blue;
+  display: flex;
+  justify-content: space-around;
+}
+
+#humidity {
+  border: 1 px solid green;
+}
+
+#wind-stats {
+  border: 1 px solid orange;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
