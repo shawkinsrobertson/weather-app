@@ -2,6 +2,7 @@
 const getWeatherBtn = document.getElementById('get-weather-btn');
 const locationDropDwn = document.getElementById('location-dropdown');
 const unitSwitch = document.getElementById('unit-switch');
+const headerDisplay = document.getElementById("location"); 
 
 //main weather stats
 const mainWeather = document.getElementById('weather-main');
@@ -15,113 +16,96 @@ const wind = document.getElementById('wind');
 const gust = document.getElementById('wind-gust');
 
 async function getWeather (city) {
-  const cityTLC = city.toLowerCase();
   try {
-    const url = `https://weather-proxy.freecodecamp.rocks/api/city/${cityTLC}`;
+    const url = `https://weather-proxy.freecodecamp.rocks/api/city/${city}`;
      const response = await fetch(url);
      const data = await response.json();
      return data;
   } catch(error) {
-    console.log("could not fetch weather data.");
+    console.log(error);
   }
   
 };
 
-//helper functions; all test if data is present/valid and returns "N/A" for undefined values
+
+function getCity(){
+ return locationDropDwn.value;
+}
 
 function imperialOrMetric () {
   return unitSwitch.checked;
 }
 
 
-function getWeatherMain (arr) {
-//grabs main weather description
-  const mainVal = arr[0].main
-  console.log(mainVal)
-  if(!mainVal) {return "N/A";}
-  return mainVal;
+function getWeatherMain ([{main}]) {
+  return main ?? "N/A";
 }
 
-function getIconURL(arr) {
-  const iconURL = arr[0].icon;
-  console.log(iconURL);
-  //takes url and updates img element's href and alt attributes
-  if(!url) {return "N/A";}
-  return iconURL;
+function getIconURL([{main, icon}]) {
+  if(icon == null) {return "N/A";}
+  weatherIcon.alt = main;
+  return icon;
 }
 
-function getTemp (obj) {
-  const temp = obj.main.temp;
-  //gets temp and updates text content with number and phrase 'degrees celsius/fahrenheit'; will also do conversion based on toggle input
-  if(!temp) {return "N/A";}
-  
-  if(!imperialOrMetric()) {
-  const fahrenheit = Math.round((temp * 1.8) + 32);
-  return `${fahrenheit} <span>&#176;</span>F`;
+function getTemp({ main: { temp } }) {
+  if (temp == null) return "N/A";
+  if (imperialOrMetric()) {
+    const fahrenheit = Math.round((temp * 1.8) + 32);
+    return `${fahrenheit} <span>&#176;</span>F`;
   } else {
-  const celsius = Math.round(temp);
-  return `${celsius} <span>&#176;</span>C`;
+    return `${temp} <span>&#176;</span>C`;
   }
 }
 
-function getFeels (obj) {
-const feltTemp = obj.main.feels_like;
-  //gets feels like data and updates text content
-
-  if(!feltTemp) {return "N/A";}
-
-  if(!imperialOrMetric()) {
-  const fahrenheit = Math.round((feltTemp * 1.8) + 32);
-  return `feels like ${fahrenheit}`;
+function getFeels({ main: { feels_like } }) {
+  if (feels_like == null) return "N/A";
+  if (imperialOrMetric()) {
+    const fahrenheit = Math.round((feels_like * 1.8) + 32);
+    return `feels like ${fahrenheit}<span>&#176;</span>`;
   } else {
-  const celsius = Math.round(feltTemp);
-  return `feels like ${celsius}`;
+    return `feels like ${feels_like}<span>&#176;</span>`;
   }
 }
 
-function getHumidity (obj) {
-  const humid = obj.main.humidity;
-  //grabs humidity and updates text content with '%'
+function getHumidity ({ main: { humidity } }) {
+    if(humidity == null) {return "N/A";}
 
-  if(!humid) {return "N/A";}
-
-  return `${humid}%`;
+  return `${humidity}%`;
 }
 
-function getWindSpeed (obj) {
-  const windSpeed = obj.wind.speed;
-  //gets wind speed and updates text content after converting to mph based on toggle input
-  
-  if(!windSpeed) {return "N/A";}
-  if(!imperialOrMetric()) {
-  const MPH = Math.round(windSpeed / 0.44704);
-  return `${MPH} mph`;
+function getWindSpeed({ wind: { speed } }) {
+  if (speed == null) return "N/A";
+  if (imperialOrMetric()) {
+    const mph = Math.round(speed / 0.44704);
+    return `${mph} mph`;
   } else {
-    const mPS = Math.round(windSpeed);
-    return `${mPS} m/s`;}
-};
+    return `${speed} m/s`;
+  }
+}
 
-function getGust (obj) {
-  const windGust = obj.wind.gust;
-  //updates wind gust based on conversion; 
-  if(!windGust) {return "N/A";}
-  if(!imperialOrMetric()) {
-    const gustPH = Math.round(windGust / 0.44704);
-    return `${gustPH} mph`;
-    } else {
-    const gustPS = Math.round(windGust);
-    return `${gustPS} m/s`}
-};
+function getGust({ wind: { gust } }) {
+  if (gust == null) return "N/A";
+  if (imperialOrMetric()) {
+    const gustMph = Math.round(gust / 0.44704);
+    return `${gustMph} mph`;
+  } else {
+    return `${gust} m/s`;
+  }
+}
 
 async function showWeather (city) {
-  try {
     const weatherData =  await getWeather(city);
-    const mainWeatherArr = weatherData.weather;
 
+    if (!weatherData || weatherData.error) {
+    return undefined;
+  }
+    const mainWeatherArr = weatherData.weather;
+  try {  
+    headerDisplay.textContent = weatherData.name;
     mainWeather.textContent = getWeatherMain(mainWeatherArr);
-    //weatherIcon.src = getIconURL(mainWeatherArr);
+    weatherIcon.src = getIconURL(mainWeatherArr);
     mainTempEl.innerHTML = getTemp(weatherData);
-    feelsLikeEl.textContent = getFeels(weatherData);
+    feelsLikeEl.innerHTML = getFeels(weatherData);
     humidity.textContent = getHumidity(weatherData);
     wind.textContent = getWindSpeed(weatherData);
     gust.textContent = getGust(weatherData);
@@ -131,11 +115,32 @@ async function showWeather (city) {
     return weatherData
 
   } catch(error) {
-    console.log("Something went wrong, please try again later");
+    console.log(error);
   }
   
 
 }
 
-console.log(showWeather("London"))
+// event listeners
 
+locationDropDwn.addEventListener("change", () => {
+  const city = getCity();
+  console.log(city);
+  getWeather(city);
+});
+
+getWeatherBtn.addEventListener("click", async () => {
+  console.log("clicked");
+  const city = getCity();
+  console.log("city:", city);
+  const result = await showWeather(city);
+  if(!result) {
+    alert("Something went wrong, please try again later");
+  }
+});
+
+unitSwitch.addEventListener("change", () => {
+  imperialOrMetric();
+  const city = getCity();
+  showWeather(city);
+  });
